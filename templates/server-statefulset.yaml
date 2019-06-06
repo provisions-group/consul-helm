@@ -154,16 +154,23 @@ spec:
             - containerPort: 8600
               name: dns-udp
               protocol: "UDP"
-          readinessProbe:
-            # NOTE(mitchellh): when our HTTP status endpoints support the
-            # proper status codes, we should switch to that. This is temporary.
+          livenessProbe:
             exec:
               command:
-                - "/bin/sh"
-                - "-ec"
-                - |
-                  curl http://127.0.0.1:8500/v1/status/leader 2>/dev/null | \
-                  grep -E '".+"'
+                - consul
+                - operator
+                - raft
+                - list-peers
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - consul
+                - members
             failureThreshold: 2
             initialDelaySeconds: 5
             periodSeconds: 3

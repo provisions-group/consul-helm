@@ -48,11 +48,13 @@ spec:
               consul-k8s inject-connect \
                 -default-inject={{ .Values.connectInject.default }} \
                 -consul-image="{{ default .Values.global.image .Values.connectInject.imageConsul }}" \
-                -consul-cacert-secret="consul-client-certs" \
-                -consul-cacert="ca.pem" \
-                -consul-tls-server-name="client.dc1.consul" \
+                {{- if .Values.connectInject.consulTLS.enabled }}
                 -consul-http-ssl="true" \
                 -consul-grpc-ssl="true" \
+                -consul-cacert-secret="{{ .Values.connectInject.consulTLS.caCert.secretName }}" \
+                -consul-cacert="{{ .Values.connectInject.consulTLS.caCert.secretKey }}" \
+                -consul-tls-server-name="{{ .Values.connectInject.consulTLS.tlsServerName }}" \
+                {{- end }}
                 {{ if .Values.connectInject.imageEnvoy -}}
                 -envoy-image="{{ .Values.connectInject.imageEnvoy }}" \
                 {{ end -}}

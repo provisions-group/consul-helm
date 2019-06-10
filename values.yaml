@@ -387,3 +387,10 @@ connectInject:
     # configured proxy.
     proxyDefaults: |
       {}
+
+  consulTLS:
+    enabled: false
+    caCert:
+      secretName: consul-client-certs
+      secretKey: ca.pem
+    tlsServerName: client.dc1.consul

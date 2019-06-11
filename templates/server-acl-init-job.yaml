@@ -37,6 +37,12 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: CONSUL_HTTP_SSL
+              value: "true"
+            - name: CONSUL_HTTP_SSL_VERIFY
+              value: "false"
+            - name: CONSUL_TLS_SERVER_NAME
+              value: server.dc1.consul
           command:
             - "/bin/sh"
             - "-ec"

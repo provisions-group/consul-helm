@@ -170,28 +170,16 @@ spec:
             - containerPort: 8600
               name: dns-udp
               protocol: "UDP"
-          livenessProbe:
-            exec:
-              command:
-                - consul
-                - operator
-                - raft
-                - list-peers
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 3
-            successThreshold: 1
-            timeoutSeconds: 5
           readinessProbe:
+            # NOTE(mitchellh): when our HTTP status endpoints support the
+            # proper status codes, we should switch to that. This is temporary.
             exec:
               command:
-                - consul
-                - members
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 3
-            successThreshold: 1
-            timeoutSeconds: 5
+                - "/bin/sh"
+                - "-ec"
+                - |
+                  curl -k https://127.0.0.1:8500/v1/status/leader 2>/dev/null | \
+                  grep -E '".+"'
           {{- if .Values.client.resources }}
           resources:
             {{ tpl .Values.client.resources . | nindent 12 | trim }}

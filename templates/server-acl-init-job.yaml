@@ -16,6 +16,7 @@ metadata:
     "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
+  ttlSecondsAfterFinished: 120
   template:
     metadata:
       name: {{ template "consul.fullname" . }}-server-acl-init
@@ -29,6 +30,21 @@ spec:
     spec:
       restartPolicy: Never
       serviceAccountName: {{ template "consul.fullname" . }}-server-acl-init
+      initContainers:
+        - name: init-post-install-job
+          image: bitnami/kubectl:1.13
+          command:
+            - "/bin/bash"
+            - "-c"
+            - |
+              echo "waiting for {{ .Values.server.replicas }} servers...";
+              COUNT=0; 
+              while [[ $COUNT -lt {{ .Values.server.replicas }} ]]; do 
+                COUNT=$(kubectl get pods -n {{ .Release.Namespace }} -l "app=consul,component=server" | grep -E '([0-9]+)/\1' | wc -l); 
+                echo "waiting for {{ .Values.server.replicas }} servers ... $COUNT"; 
+                sleep 10s; 
+              done; 
+              sleep 10s;
       containers:
         - name: post-install-job
           image: {{ .Values.global.imageK8S }}

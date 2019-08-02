@@ -55,6 +55,14 @@ spec:
                   name: "{{ .Release.Name }}-consul-catalog-sync-acl-token"
                   key: "token"
             {{- end}}
+            {{- if (or (and (ne (.Values.syncCatalog.consulTLS.enabled | toString) "-") .Values.syncCatalog.consulTLS.enabled) (and (eq (.Values.syncCatalog.consulTLS.enabled | toString) "-") .Values.global.enabled)) }}
+            - name: CONSUL_HTTP_SSL
+              value: "true"
+            - name: CONSUL_HTTP_SSL_VERIFY
+              value: "false"
+            - name: CONSUL_TLS_SERVER_NAME
+              value: {{ .Values.syncCatalog.consulTLS.tlsServerName }}              
+            {{- end}}
           command:
             - "/bin/sh"
             - "-ec"

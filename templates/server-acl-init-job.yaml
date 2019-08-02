@@ -30,6 +30,8 @@ spec:
     spec:
       restartPolicy: Never
       serviceAccountName: {{ template "consul.fullname" . }}-server-acl-init
+      # I wonder if the code for this initContainer should be moved to "consul-k8s acl-init" with a new init-type?
+      # this seems to be the pattern in other cases
       initContainers:
         - name: init-post-install-job
           image: bitnami/kubectl:1.13
